@@ -7,6 +7,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score, recall_score,accuracy_score
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.pipeline import make_pipeline
+from sklearn.preprocessing import StandardScaler
+
 
 
 def load_dataset(dataset_path):
@@ -26,7 +30,7 @@ def split_dataset(dataset_df, testset_size):
 	#To-Do: Implement this function
 	x = dataset_df.drop(columns="target",axis = 1)#라벨 제외
 	y = dataset_df['target']#라벨 분류
-	train_data, test_data, train_label, test_label = train_test_split(x,y,test_size = testset_size,random_state=1)#train/test 분류,일단 고정
+	train_data, test_data, train_label, test_label = train_test_split(x,y,test_size = testset_size)#train/test 분류,일단 고정
 	return train_data, test_data, train_label, test_label
 
 def decision_tree_train_test(x_train, x_test, y_train, y_test):
@@ -43,7 +47,7 @@ def decision_tree_train_test(x_train, x_test, y_train, y_test):
 
 def random_forest_train_test(x_train, x_test, y_train, y_test):
 	#To-Do: Implement this function
-	rf = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=123456)
+	rf = RandomForestClassifier(n_estimators=100, oob_score=True)
 	rf.fit(x_train, y_train)
 
 	#예측값 저장
@@ -54,8 +58,17 @@ def random_forest_train_test(x_train, x_test, y_train, y_test):
 	
 	return acc, prec, recall
 
-# def svm_train_test(x_train, x_test, y_train, y_test):
-# 	#To-Do: Implement this function
+def svm_train_test(x_train, x_test, y_train, y_test):
+	#To-Do: Implement this function
+	svm_pipe = make_pipeline(StandardScaler(),SVC())
+	svm_pipe.fit(x_train, y_train)
+	
+	pred = svm_pipe.predict(x_test)
+	acc = accuracy_score(y_test, pred)
+	prec = precision_score(y_test, pred)
+	recall = recall_score(y_test, pred)
+
+	return acc, prec, recall
 
 def print_performances(acc, prec, recall):
 	#Do not modify this function!
@@ -84,6 +97,6 @@ if __name__ == '__main__':
 	print ("\nRandom Forest Performances")
 	print_performances(acc, prec, recall)
 
-	# acc, prec, recall = svm_train_test(x_train, x_test, y_train, y_test)
-	# print ("\nSVM Performances")
-	# print_performances(acc, prec, recall)
+	acc, prec, recall = svm_train_test(x_train, x_test, y_train, y_test)
+	print ("\nSVM Performances")
+	print_performances(acc, prec, recall)
